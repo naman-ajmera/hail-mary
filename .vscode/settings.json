@@ -1,0 +1,5 @@
+{
+    "java.search.scope": "all",
+    "java.project.explorer.showNonJavaResources": true,
+    "java.compile.nullAnalysis.mode": "disabled"
+}
