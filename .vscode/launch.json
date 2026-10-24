@@ -2,11 +2,41 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Spring Boot-EventServiceApplication<event-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/services/event-service",
+            "mainClass": "com.ticketbooking.event.EventServiceApplication",
+            "projectName": "event-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-ApiGatewayApplication<api-gateway>",
             "request": "launch",
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/api-gateway",
             "mainClass": "com.ticketbooking.gateway.ApiGatewayApplication",
             "projectName": "api-gateway",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BookingServiceApplication<booking-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.ticketbooking.booking.BookingServiceApplication",
+            "projectName": "booking-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SearchServiceApplication<search-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.ticketbooking.search.SearchServiceApplication",
+            "projectName": "search-service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

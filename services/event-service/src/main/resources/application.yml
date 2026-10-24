@@ -1,0 +1,37 @@
+server:
+  port: ${SERVER_PORT:8081}
+
+spring:
+  application:
+    name: event-service
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
+  # When ready to connect to PostgreSQL, remove the autoconfigure.exclude above and uncomment below:
+  # datasource:
+  #   url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketdb}
+  #   username: ${DB_USERNAME:ticketapp}
+  #   password: ${DB_PASSWORD:}
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: validate
+  #   open-in-view: false
+  # flyway:
+  #   enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+info:
+  app:
+    name: Event Service
+    description: Event catalogue API
