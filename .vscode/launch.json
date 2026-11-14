@@ -22,6 +22,16 @@
         },
         {
             "type": "java",
+            "name": "Spring Boot-AuthServiceApplication<auth-service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/services/auth-service",
+            "mainClass": "com.ticketbooking.auth.AuthServiceApplication",
+            "projectName": "auth-service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-BookingServiceApplication<booking-service>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
