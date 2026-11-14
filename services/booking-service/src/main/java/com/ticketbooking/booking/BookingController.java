@@ -17,8 +17,10 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Booking create(@Valid @RequestBody CreateRequest r) {
-        var b = new Booking(UUID.randomUUID().toString(), r.eventId(), r.showId(), List.copyOf(r.seatIds()), "PENDING",
+    public Booking create(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @Valid @RequestBody CreateRequest r) {
+        var b = new Booking(UUID.randomUUID().toString(), userId, r.eventId(), r.showId(), List.copyOf(r.seatIds()), "PENDING",
                 Instant.now().toString());
         data.put(b.bookingId(), b);
         return b;
@@ -36,7 +38,5 @@ public class BookingController {
             @NotEmpty List<@NotBlank String> seatIds) {
     }
 
-    public record Booking(String bookingId, String eventId, String showId, List<String> seatIds, String status,
-            String createdAt) {
-    }
+    public record Booking(String bookingId, String userId, String eventId, String showId, List<String> seatIds, String status, String createdAt) {}
 }
