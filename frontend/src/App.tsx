@@ -4,6 +4,7 @@ import type { Showtime, Seat, BookingResponse } from './types/booking'
 import type { User, SavedBooking } from './types/user'
 import { getEvents } from './services/eventService'
 import { searchEvents } from './services/searchService'
+import { getStoredUser, logout } from './services/authService'
 import { SPOTLIGHT_ITEMS } from './data/displayMetadata'
 import { Navbar } from './components/Navbar'
 import { HeroBanner } from './components/discovery/HeroBanner'
@@ -32,15 +33,8 @@ export function App() {
   const [confirmedBooking, setConfirmedBooking] = useState<BookingResponse | null>(null)
   const [confirmedBookingSeats, setConfirmedBookingSeats] = useState<Seat[]>([])
 
-  // User & Saved Bookings State (Persisted in localStorage)
-  const [currentUser, setCurrentUser] = useState<User | null>(() => {
-    try {
-      const stored = localStorage.getItem('hm_user')
-      return stored ? (JSON.parse(stored) as User) : null
-    } catch {
-      return null
-    }
-  })
+  // User & Saved Bookings State (Persisted in localStorage with JWT)
+  const [currentUser, setCurrentUser] = useState<User | null>(() => getStoredUser())
 
   const [savedBookings, setSavedBookings] = useState<SavedBooking[]>(() => {
     try {
@@ -236,7 +230,7 @@ export function App() {
   }
 
   const handleSignOut = () => {
-    localStorage.removeItem('hm_user')
+    logout()
     setCurrentUser(null)
   }
 
@@ -338,6 +332,7 @@ export function App() {
             currentUser={currentUser}
             onBackToDetails={() => setCurrentView('EVENT_DETAIL')}
             onBookingSuccess={handleBookingSuccess}
+            onOpenAuthModal={() => setIsAuthModalOpen(true)}
           />
         ) : currentView === 'EVENT_DETAIL' && selectedEventForDetail ? (
           /* ===============================================================
@@ -450,17 +445,7 @@ export function App() {
             <div className="hm-footer__brand">🎬 Hail Mary</div>
             <p>
               Your premier entertainment ticketing hub for movies and live events in Ireland.
-              MSc Final Project System.
             </p>
-          </div>
-          <div className="hm-footer__col">
-            <h4>Microservices Architecture</h4>
-            <ul>
-              <li>API Gateway: Port 8080</li>
-              <li>Event Service: Port 8081</li>
-              <li>Booking Service: Port 8082</li>
-              <li>Search Service: Port 8084</li>
-            </ul>
           </div>
           <div className="hm-footer__col">
             <h4>Quick Links</h4>

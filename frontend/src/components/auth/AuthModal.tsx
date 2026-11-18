@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import type { User } from '../../types/user'
+import { login, register } from '../../services/authService'
 import { UserIcon, XIcon } from '../common/Icons'
 
 interface AuthModalProps {
@@ -14,10 +15,11 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   if (!isOpen) return null
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     setError(null)
 
@@ -31,27 +33,35 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
       return
     }
 
-    const resolvedUser: User = {
-      id: `usr-${Date.now()}`,
-      name: tab === 'REGISTER' ? name.trim() : email.split('@')[0],
-      email: email.trim(),
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.')
+      return
     }
 
-    localStorage.setItem('hm_user', JSON.stringify(resolvedUser))
-    onLoginSuccess(resolvedUser)
-    onClose()
-  }
+    setIsLoading(true)
 
-  const handleDemoLogin = () => {
-    const demoUser: User = {
-      id: 'usr-msc-demo',
-      name: 'Alex Murphy (MSc)',
-      email: 'alex.murphy@university.ie',
-      phone: '+353 87 123 4567',
+    try {
+      if (tab === 'REGISTER') {
+        const { user } = await register({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        })
+        onLoginSuccess(user)
+      } else {
+        const { user } = await login({
+          email: email.trim(),
+          password,
+        })
+        onLoginSuccess(user)
+      }
+      onClose()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Authentication failed. Please try again.'
+      setError(msg)
+    } finally {
+      setIsLoading(false)
     }
-    localStorage.setItem('hm_user', JSON.stringify(demoUser))
-    onLoginSuccess(demoUser)
-    onClose()
   }
 
   return (
@@ -81,6 +91,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
               setTab('LOGIN')
               setError(null)
             }}
+            disabled={isLoading}
           >
             Sign In
           </button>
@@ -91,19 +102,9 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
               setTab('REGISTER')
               setError(null)
             }}
+            disabled={isLoading}
           >
             Create Account
-          </button>
-        </div>
-
-        {/* 1-Click Demo Shortcut for Lecturer Demo */}
-        <div className="hm-demo-login-box">
-          <button
-            type="button"
-            className="hm-button hm-button--small hm-button--secondary hm-button--block"
-            onClick={handleDemoLogin}
-          >
-            ⚡ Quick 1-Click Demo Login (MSc Evaluator)
           </button>
         </div>
 
@@ -120,6 +121,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="hm-input"
+                disabled={isLoading}
               />
             </div>
           )}
@@ -133,6 +135,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="hm-input"
+              disabled={isLoading}
             />
           </div>
 
@@ -145,19 +148,23 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="hm-input"
+              disabled={isLoading}
             />
           </div>
 
-          <button type="submit" className="hm-button hm-button--primary hm-button--block">
-            {tab === 'LOGIN' ? 'Sign In to Hail Mary' : 'Create Account & Continue'}
+          <button
+            type="submit"
+            className="hm-button hm-button--primary hm-button--block"
+            disabled={isLoading}
+          >
+            {isLoading
+              ? 'Loading...'
+              : tab === 'LOGIN'
+                ? 'Sign In to Hail Mary'
+                : 'Create Account & Continue'}
           </button>
         </form>
-
-        <p className="hm-auth-note">
-          Simulated local session for MSc evaluation. Ready to point to teammate's user microservice when deployed.
-        </p>
       </div>
     </div>
   )
 }
-

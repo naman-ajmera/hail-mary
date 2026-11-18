@@ -15,6 +15,7 @@ interface SeatSelectionViewProps {
   currentUser: User | null
   onBackToDetails: () => void
   onBookingSuccess: (booking: BookingResponse, selectedSeats: Seat[], paymentMethod: string) => void
+  onOpenAuthModal?: () => void
 }
 
 export function SeatSelectionView({
@@ -23,6 +24,7 @@ export function SeatSelectionView({
   currentUser,
   onBackToDetails,
   onBookingSuccess,
+  onOpenAuthModal,
 }: SeatSelectionViewProps) {
   // Generate seats for this auditorium
   const initialSeats = useMemo(() => generateSeatMatrix(showtime), [showtime])
@@ -63,6 +65,13 @@ export function SeatSelectionView({
   // Open payment dialog
   const handleProceedToPayment = () => {
     if (selectedSeatIds.length === 0) return
+    if (!currentUser) {
+      setWarningMessage('Please sign in to proceed with your booking reservation.')
+      if (onOpenAuthModal) {
+        onOpenAuthModal()
+      }
+      return
+    }
     setIsPaymentModalOpen(true)
   }
 
