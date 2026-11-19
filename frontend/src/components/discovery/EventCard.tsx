@@ -25,11 +25,6 @@ export function EventCard({ item, onSelect }: EventCardProps) {
           <Badge variant={isMovie ? 'primary' : 'accent'}>
             {item.category}
           </Badge>
-          {item.isBackendSource && (
-            <Badge variant="warning" className="hm-backend-badge" title="Retrieved live from Backend Microservice">
-              API
-            </Badge>
-          )}
         </div>
 
         {/* Rating overlay */}

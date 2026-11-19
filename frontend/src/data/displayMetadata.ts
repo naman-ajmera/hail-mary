@@ -107,7 +107,6 @@ export const SPOTLIGHT_ITEMS: EventItem[] = [
     venue: 'Cineworld IMAX, Dublin',
     priceFrom: 16.50,
     description: 'Experience the ultimate cinematic spectacle on Irelands largest IMAX screen. Tickets selling fast for opening weekend.',
-    isBackendSource: false,
   },
   {
     id: 'spotlight-2',
@@ -126,7 +125,6 @@ export const SPOTLIGHT_ITEMS: EventItem[] = [
     venue: '3Arena Dublin',
     priceFrom: 49.00,
     description: 'The premier electronic and visual experience of the season featuring laser shows and world-touring headliners.',
-    isBackendSource: false,
   },
   {
     id: 'spotlight-3',
@@ -145,9 +143,7 @@ export const SPOTLIGHT_ITEMS: EventItem[] = [
     venue: 'The Gate Cinema, Cork',
     priceFrom: 12.50,
     description: 'Critically acclaimed deep space exploration thriller now arriving at select premier theaters in Cork.',
-    isBackendSource: false,
   },
 ]
 
 export const POPULAR_CITIES = ['All Cities', 'Dublin', 'Cork', 'Galway', 'Limerick']
-
