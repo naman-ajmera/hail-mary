@@ -21,6 +21,10 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
+  // Read stored JWT token to attach Authorization header if available
+  const token = typeof window !== 'undefined' ? localStorage.getItem('hm_token') : null
+  const authHeader: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {}
+
   try {
     const response = await fetch(endpoint, {
       ...options,
@@ -28,6 +32,7 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
+        ...authHeader,
         ...(options.headers || {}),
       },
     })
@@ -39,12 +44,32 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
       } catch {
         errorDetails = await response.text()
       }
+
+      // Extract detailed server error message if available
+      let detailedMessage = `API Request failed with status ${response.status} (${response.statusText})`
+      if (typeof errorDetails === 'object' && errorDetails !== null) {
+        const errObj = errorDetails as Record<string, unknown>
+        if (typeof errObj.message === 'string' && errObj.message) {
+          detailedMessage = errObj.message
+        } else if (typeof errObj.error === 'string' && errObj.error) {
+          detailedMessage = errObj.error
+        }
+      } else if (typeof errorDetails === 'string' && errorDetails) {
+        detailedMessage = errorDetails
+      }
+
       throw new ApiError(
-        `API Request failed with status ${response.status} (${response.statusText})`,
+        detailedMessage,
         response.status,
         response.statusText,
         errorDetails
       )
+    }
+
+    // Handle empty 204 or 201 without content
+    const contentLength = response.headers.get('content-length')
+    if (response.status === 204 || contentLength === '0') {
+      return {} as T
     }
 
     return (await response.json()) as T
@@ -61,4 +86,3 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
     clearTimeout(timeoutId)
   }
 }
-

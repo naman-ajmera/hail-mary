@@ -2,7 +2,28 @@ export interface User {
   id: string
   name: string
   email: string
+  role?: string
   phone?: string
+}
+
+export interface AuthResponse {
+  token: string
+  tokenType: string
+  userId: string
+  email: string
+  name: string
+  role: string
+}
+
+export interface LoginCredentials {
+  email: string
+  password: string
+}
+
+export interface RegisterData {
+  email: string
+  password: string
+  name: string
 }
 
 export interface SavedBooking {
@@ -22,4 +43,3 @@ export interface SavedBooking {
   createdAt: string
   paymentMethod: string
 }
-
