@@ -4,23 +4,15 @@ server:
 spring:
   application:
     name: event-service
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
-      - org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
-  # When ready to connect to PostgreSQL, remove the autoconfigure.exclude above and uncomment below:
-  # datasource:
-  #   url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketdb}
-  #   username: ${DB_USERNAME:ticketapp}
-  #   password: ${DB_PASSWORD:}
-  # jpa:
-  #   hibernate:
-  #     ddl-auto: validate
-  #   open-in-view: false
-  # flyway:
-  #   enabled: false
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:eventdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE}
+    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
 
 management:
   endpoints:
