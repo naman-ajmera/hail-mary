@@ -449,6 +449,7 @@ export function App() {
   const handleSignOut = () => {
     logout()
     setCurrentUser(null)
+    setIsBookingsModalOpen(false)
   }
 
   const handleViewTicketFromHistory = (saved: SavedBooking) => {
@@ -633,7 +634,6 @@ export function App() {
                           title="Now Showing in Theatres"
                           subtitle="Latest blockbusters and critically acclaimed releases"
                           items={movieItems}
-                          badge={<Badge variant="primary">Cinema</Badge>}
                           onSelectItem={handleOpenEventDetail}
                         />
                       )}
@@ -766,7 +766,7 @@ export function App() {
 
       {/* My Bookings Modal */}
       <MyBookingsModal
-        isOpen={isBookingsModalOpen}
+        isOpen={isBookingsModalOpen && currentUser !== null}
         bookings={savedBookings}
         onClose={() => setIsBookingsModalOpen(false)}
         onViewTicket={handleViewTicketFromHistory}

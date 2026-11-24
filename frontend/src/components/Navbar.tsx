@@ -98,19 +98,21 @@ export function Navbar({
               <ChevronDownIcon width={14} height={14} className="hm-city-btn__arrow" />
             </button>
 
-            {/* My Bookings link */}
-            <button
-              type="button"
-              className="hm-navbar__link-btn"
-              onClick={onOpenMyBookingsModal}
-              title="View your booked tickets"
-            >
-              <TicketIcon width={16} height={16} />
-              <span className="hm-hide-mobile">My Bookings</span>
-              {bookingsCount > 0 && (
-                <span className="hm-nav-badge">{bookingsCount}</span>
-              )}
-            </button>
+            {/* My Bookings link - Only visible when user is signed in */}
+            {currentUser && (
+              <button
+                type="button"
+                className="hm-navbar__link-btn"
+                onClick={onOpenMyBookingsModal}
+                title="View your booked tickets"
+              >
+                <TicketIcon width={16} height={16} />
+                <span className="hm-hide-mobile">My Bookings</span>
+                {bookingsCount > 0 && (
+                  <span className="hm-nav-badge">{bookingsCount}</span>
+                )}
+              </button>
+            )}
 
             {/* Auth CTA / User Profile */}
             {currentUser ? (
