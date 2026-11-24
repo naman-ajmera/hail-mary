@@ -1,4 +1,4 @@
-import { request, ApiError } from './apiClient'
+import { request } from './apiClient'
 import type { User, AuthResponse, LoginCredentials, RegisterData } from '../types/user'
 
 const TOKEN_KEY = 'hm_token'

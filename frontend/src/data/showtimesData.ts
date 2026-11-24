@@ -154,14 +154,14 @@ export function generateShowtimes(eventId: string, city: string, date: string): 
  */
 export function generateSeatMatrix(showtime: Showtime): Seat[] {
   const rows: { row: string; tier: SeatTier }[] = [
-    { row: 'A', tier: 'VIP' },
-    { row: 'B', tier: 'VIP' },
-    { row: 'C', tier: 'PREMIUM' },
+    { row: 'A', tier: 'STANDARD' },
+    { row: 'B', tier: 'STANDARD' },
+    { row: 'C', tier: 'STANDARD' },
     { row: 'D', tier: 'PREMIUM' },
     { row: 'E', tier: 'PREMIUM' },
-    { row: 'F', tier: 'STANDARD' },
-    { row: 'G', tier: 'STANDARD' },
-    { row: 'H', tier: 'STANDARD' },
+    { row: 'F', tier: 'PREMIUM' },
+    { row: 'G', tier: 'VIP' },
+    { row: 'H', tier: 'VIP' },
   ]
 
   // Deterministic set of reserved seats based on showtime ID length/chars
@@ -220,4 +220,54 @@ export function getUpcomingDates(daysCount = 6): { date: string; dayName: string
 
   return dates
 }
+
+/**
+ * Resolves a showtime by eventId and showtimeId.
+ * Searches across upcoming dates and venues, with a fallback reconstruction if not found.
+ */
+export function getShowtimeById(eventId: string, showtimeId: string, city?: string): Showtime {
+  const targetCity = city && city !== 'All Cities' ? city : 'Dublin'
+  const dates = getUpcomingDates(7)
+
+  for (const d of dates) {
+    const list = generateShowtimes(eventId, targetCity, d.date)
+    const match = list.find((s) => s.id === showtimeId)
+    if (match) return match
+  }
+
+  const otherCities = ['Cork', 'Galway', 'Limerick'].filter(
+    (c) => c.toLowerCase() !== targetCity.toLowerCase()
+  )
+  for (const c of otherCities) {
+    for (const d of dates) {
+      const list = generateShowtimes(eventId, c, d.date)
+      const match = list.find((s) => s.id === showtimeId)
+      if (match) return match
+    }
+  }
+
+  // Fallback: reconstruct a realistic Showtime from the ID
+  const parts = showtimeId.split('-')
+  let timeStr = '19:30'
+  if (parts.length >= 4) {
+    const rawTime = parts[parts.length - 1]
+    if (rawTime && rawTime.length === 4) {
+      timeStr = `${rawTime.slice(0, 2)}:${rawTime.slice(2)}`
+    }
+  }
+
+  return {
+    id: showtimeId,
+    eventId,
+    venueId: 'venue-fallback',
+    venueName: `${targetCity} Grand Cinema`,
+    city: targetCity,
+    date: dates[0]?.date || 'Today',
+    time: timeStr,
+    screen: 'Screen 1 (Laser 4K)',
+    format: 'Digital 4K',
+    priceTiers: { VIP: 16.5, PREMIUM: 13.5, STANDARD: 10.5 },
+  }
+}
+
 

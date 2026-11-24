@@ -70,11 +70,6 @@ export function EventDetailView({
                 alt={event.title}
                 className="hm-detail-hero__poster"
               />
-              {event.isBackendSource && (
-                <div className="hm-detail-hero__backend-tag">
-                  Live Event #{event.id}
-                </div>
-              )}
             </div>
 
             {/* Movie Info */}

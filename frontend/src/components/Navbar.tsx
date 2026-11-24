@@ -23,7 +23,6 @@ interface NavbarProps {
   onSignOut: () => void
   onOpenMyBookingsModal: () => void
   bookingsCount: number
-  isBackendConnected: boolean
 }
 
 export function Navbar({
@@ -39,7 +38,6 @@ export function Navbar({
   onSignOut,
   onOpenMyBookingsModal,
   bookingsCount,
-  isBackendConnected,
 }: NavbarProps) {
   const handleSearchSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -56,7 +54,7 @@ export function Navbar({
             <span className="hm-navbar__logo-icon">🎬</span>
             <div className="hm-navbar__logo-text">
               <span className="hm-navbar__brand-name">Hail Mary</span>
-              <span className="hm-navbar__brand-tagline">Tickets & Shows</span>
+              <span className="hm-navbar__brand-tagline">Movies & Events</span>
             </div>
           </div>
 
@@ -171,11 +169,6 @@ export function Navbar({
               <TicketIcon width={15} height={15} />
               Live Events & Concerts
             </button>
-          </div>
-
-          <div className="hm-navbar__backend-status" title={isBackendConnected ? 'Connected to Spring Cloud Gateway on port 8080' : 'Backend Gateway is currently unreachable. Demo mock data active.'}>
-            <span className={`hm-status-indicator ${isBackendConnected ? 'hm-status-indicator--online' : 'hm-status-indicator--offline'}`} />
-            <small>{isBackendConnected ? 'API Gateway Online (:8080)' : 'Gateway Offline (Demo Mode)'}</small>
           </div>
         </div>
       </nav>

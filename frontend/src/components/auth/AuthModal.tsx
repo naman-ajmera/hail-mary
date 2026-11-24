@@ -70,7 +70,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
         <div className="hm-modal-header">
           <div className="hm-modal-title">
             <UserIcon width={22} height={22} />
-            <h3>Hail Mary Member Access</h3>
+            <h3>Get Started</h3>
           </div>
           <button
             type="button"
