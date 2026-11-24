@@ -12,11 +12,11 @@ export function SeatMatrix({
   selectedSeatIds,
   onToggleSeat,
 }: SeatMatrixProps) {
-  // Group seats by Tier, then by Row
+  // Group seats by Tier, then by Row (Screen is at top, so Standard is closest to screen, VIP is furthest)
   const tierOrder: { tier: SeatTier; label: string; priceDescription: string }[] = [
-    { tier: 'VIP', label: 'VIP Recliners', priceDescription: 'Luxury leather recliners with extra legroom' },
+    { tier: 'STANDARD', label: 'Standard Classic', priceDescription: 'Front auditorium seating closest to the screen' },
     { tier: 'PREMIUM', label: 'Premium Circle', priceDescription: 'Optimal viewing angle and Dolby sound balance' },
-    { tier: 'STANDARD', label: 'Standard Classic', priceDescription: 'Comfortable auditorium seating' },
+    { tier: 'VIP', label: 'VIP Recliners', priceDescription: 'Elevated luxury recliners with extra legroom at the back' },
   ]
 
   const selectedSet = new Set(selectedSeatIds)

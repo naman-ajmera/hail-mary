@@ -23,7 +23,7 @@ export function MyBookingsModal({
         <div className="hm-modal-header">
           <div className="hm-modal-title">
             <TicketIcon width={22} height={22} />
-            <h3>My Bookings & E-Tickets ({bookings.length})</h3>
+            <h3>My Bookings</h3>
           </div>
           <button
             type="button"

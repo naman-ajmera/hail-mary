@@ -132,14 +132,10 @@ export function BookingSummaryPanel({
               {isSubmitting
                 ? 'Connecting to Booking Service...'
                 : selectedSeats.length === 0
-                ? 'Select Seats to Proceed'
-                : `Confirm Booking • €${grandTotal.toFixed(2)}`}
+                  ? 'Select Seats to Proceed'
+                  : `Confirm Booking • €${grandTotal.toFixed(2)}`}
             </span>
           </button>
-
-          <p className="hm-summary-backend-note">
-            Communicates directly with Spring Boot <code>booking-service</code> via <code>POST /api/bookings</code>.
-          </p>
         </div>
       </div>
     </aside>
