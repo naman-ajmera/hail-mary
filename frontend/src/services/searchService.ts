@@ -50,7 +50,6 @@ export async function searchEvents(params: SearchParams = {}): Promise<EventItem
       venue: meta?.venue ?? `${result.city} Central Arena`,
       priceFrom: meta?.priceFrom ?? 15.00,
       description: meta?.description ?? 'Exciting live experience and premier production.',
-      isBackendSource: true,
     }
   })
 }

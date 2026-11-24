@@ -1,0 +1,14 @@
+package com.ticketbooking.event.repository;
+
+import com.ticketbooking.event.entity.Event;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface EventRepository extends JpaRepository<Event, String> {
+    List<Event> findByCityIgnoreCase(String city);
+    List<Event> findByCategoryIgnoreCase(String category);
+    List<Event> findByCityIgnoreCaseAndCategoryIgnoreCase(String city, String category);
+}

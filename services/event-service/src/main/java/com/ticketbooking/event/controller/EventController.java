@@ -1,20 +1,31 @@
 package com.ticketbooking.event.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ticketbooking.event.dto.EventResponse;
+import com.ticketbooking.event.service.EventService;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/events")
 public class EventController {
+
+    private final EventService eventService;
+
+    public EventController(EventService eventService) {
+        this.eventService = eventService;
+    }
+
     @GetMapping
-    public List<Map<String, Object>> getEvents() {
-        // Temporary sample response; replace with service/repository logic later.
-        return List.of(
-            Map.of("id", 1, "title", "Sample Movie Premiere", "category", "MOVIE", "city", "Dublin"),
-            Map.of("id", 2, "title", "Sample Live Concert", "category", "CONCERT", "city", "Dublin")
-        );
+    public List<EventResponse> getEvents(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String category
+    ) {
+        return eventService.getAllEvents(city, category);
+    }
+
+    @GetMapping("/{id}")
+    public EventResponse getEventById(@PathVariable String id) {
+        return eventService.getEventById(id);
     }
 }

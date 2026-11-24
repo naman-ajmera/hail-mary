@@ -472,7 +472,6 @@ export function App() {
       venue: saved.venueName,
       priceFrom: 12.0,
       description: 'Reserved booking pass.',
-      isBackendSource: true,
     }
 
     const reconstructedShowtime: Showtime = {
@@ -545,7 +544,6 @@ export function App() {
         onSignOut={handleSignOut}
         onOpenMyBookingsModal={() => setIsBookingsModalOpen(true)}
         bookingsCount={savedBookings.length}
-        isBackendConnected={apiError === null && !isLoading && backendEvents.length > 0}
       />
 
       {/* Main Dynamic View Router */}

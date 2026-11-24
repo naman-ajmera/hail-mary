@@ -8,6 +8,17 @@ export interface BackendEvent {
   title: string;
   category: 'MOVIE' | 'CONCERT' | string;
   city: string;
+  venue?: string;
+  description?: string;
+  duration?: string;
+  rating?: number;
+  votesCount?: string;
+  priceFrom?: number;
+  posterUrl?: string;
+  backdropUrl?: string;
+  genres?: string[];
+  formats?: string[];
+  languages?: string[];
 }
 
 // Matches GET /api/search from search-service (SearchController.java)
@@ -58,7 +69,6 @@ export interface EventItem {
   venue: string;
   priceFrom: number;
   description: string;
-  isBackendSource: boolean; // Flag to indicate whether record originated from real API
 }
 
 export type CategoryFilter = 'ALL' | 'MOVIE' | 'CONCERT' | 'THEATRE' | 'WORKSHOP';
