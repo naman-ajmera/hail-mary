@@ -1,42 +1,82 @@
 package com.ticketbooking.booking;
 
+import com.ticketbooking.booking.dto.BookingResponse;
+import com.ticketbooking.booking.dto.ConfirmBookingRequest;
+import com.ticketbooking.booking.dto.CreateBookingRequest;
+import com.ticketbooking.booking.dto.StripeConfigResponse;
+import com.ticketbooking.booking.service.BookingService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/bookings")
 public class BookingController {
-    private final Map<String, Booking> data = new ConcurrentHashMap<>();
 
+    private final BookingService bookingService;
+
+    public BookingController(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+
+    /**
+     * Creates a new booking in PENDING status and initializes a Stripe PaymentIntent.
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Booking create(
+    public BookingResponse create(
             @RequestHeader(value = "X-User-Id", required = false) String userId,
-            @Valid @RequestBody CreateRequest r) {
-        var b = new Booking(UUID.randomUUID().toString(), userId, r.eventId(), r.showId(), List.copyOf(r.seatIds()), "PENDING",
-                Instant.now().toString());
-        data.put(b.bookingId(), b);
-        return b;
+            @Valid @RequestBody CreateBookingRequest request) {
+        return bookingService.createBooking(userId, request);
     }
 
+    /**
+     * Confirms an existing booking after successful Stripe payment execution.
+     */
+    @PostMapping("/{id}/confirm")
+    public BookingResponse confirm(
+            @PathVariable String id,
+            @RequestBody(required = false) ConfirmBookingRequest request) {
+        return bookingService.confirmBooking(id, request);
+    }
+
+    /**
+     * Fetches details of a specific booking by ID.
+     */
     @GetMapping("/{id}")
-    public Booking get(@PathVariable String id) {
-        var b = data.get(id);
-        if (b == null)
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found");
-        return b;
+    public BookingResponse get(@PathVariable String id) {
+        return bookingService.getBooking(id);
     }
 
-    public record CreateRequest(@NotBlank String eventId, @NotBlank String showId,
-            @NotEmpty List<@NotBlank String> seatIds) {
+    /**
+     * Retrieves all bookings for the authenticated user passed via X-User-Id header.
+     */
+    @GetMapping
+    public List<BookingResponse> list(
+            @RequestHeader(value = "X-User-Id", required = false) String userId) {
+        return bookingService.getUserBookings(userId);
     }
 
-    public record Booking(String bookingId, String userId, String eventId, String showId, List<String> seatIds, String status, String createdAt) {}
+    /**
+     * Retrieves all unavailable/booked seat IDs for a given showtime
+     * so that the frontend can disable and grey them out.
+     */
+    @GetMapping("/shows/{showId}/booked-seats")
+    public List<String> getBookedSeats(@PathVariable String showId) {
+        return bookingService.getBookedSeatsForShow(showId);
+    }
+
+    /**
+     * Returns Stripe configuration metadata (publishable key & default currency)
+     * so the frontend can dynamically initialize Stripe Elements.
+     */
+    @GetMapping("/config")
+    public StripeConfigResponse getStripeConfig() {
+        return new StripeConfigResponse(
+                bookingService.getStripeService().getPublishableKey(),
+                bookingService.getStripeService().getDefaultCurrency()
+        );
+    }
 }

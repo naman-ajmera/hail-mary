@@ -1,9 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import type { EventItem } from '../../types/api'
 import type { Showtime, Seat, BookingResponse } from '../../types/booking'
 import type { User } from '../../types/user'
 import { generateSeatMatrix } from '../../data/showtimesData'
-import { createBooking } from '../../services/bookingService'
+import { getBookedSeats } from '../../services/bookingService'
 import { SeatMatrix } from './SeatMatrix'
 import { BookingSummaryPanel } from './BookingSummaryPanel'
 import { PaymentModal } from '../checkout/PaymentModal'
@@ -26,19 +26,39 @@ export function SeatSelectionView({
   onBookingSuccess,
   onOpenAuthModal,
 }: SeatSelectionViewProps) {
-  // Generate seats for this auditorium
-  const initialSeats = useMemo(() => generateSeatMatrix(showtime), [showtime])
+  // Generate base seats for this auditorium
+  const rawSeats = useMemo(() => generateSeatMatrix(showtime), [showtime])
+
+  // Seats with booked status merged in from backend
+  const [seats, setSeats] = useState<Seat[]>(rawSeats)
   const [selectedSeatIds, setSelectedSeatIds] = useState<string[]>([])
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [bookingError, setBookingError] = useState<string | null>(null)
   const [warningMessage, setWarningMessage] = useState<string | null>(null)
+
+  // Fetch booked seats from backend and mark them as RESERVED
+  const fetchAndMergeBookedSeats = useCallback(async () => {
+    try {
+      const bookedSeatIds = await getBookedSeats(showtime.id)
+      const bookedSet = new Set(bookedSeatIds)
+      setSeats(rawSeats.map((seat) =>
+        bookedSet.has(seat.id) ? { ...seat, status: 'RESERVED' as const } : seat
+      ))
+      // Also deselect any seat that became booked
+      setSelectedSeatIds((prev) => prev.filter((id) => !bookedSet.has(id)))
+    } catch {
+      // If backend unavailable, just use the raw generated seats
+      setSeats(rawSeats)
+    }
+  }, [showtime.id, rawSeats])
+
+  useEffect(() => {
+    fetchAndMergeBookedSeats()
+  }, [fetchAndMergeBookedSeats])
 
   const maxAllowedSeats = 6
 
   // Toggle seat selection
   const handleToggleSeat = (seat: Seat) => {
-    setBookingError(null)
     setWarningMessage(null)
 
     if (selectedSeatIds.includes(seat.id)) {
@@ -58,9 +78,9 @@ export function SeatSelectionView({
 
   // Selected seat objects
   const selectedSeats = useMemo(() => {
-    const seatMap = new Map(initialSeats.map((s) => [s.id, s]))
+    const seatMap = new Map(seats.map((s) => [s.id, s]))
     return selectedSeatIds.map((id) => seatMap.get(id)!).filter(Boolean)
-  }, [initialSeats, selectedSeatIds])
+  }, [seats, selectedSeatIds])
 
   // Open payment dialog
   const handleProceedToPayment = () => {
@@ -73,31 +93,6 @@ export function SeatSelectionView({
       return
     }
     setIsPaymentModalOpen(true)
-  }
-
-  // Submit to Spring Boot booking-service (POST /api/bookings)
-  const handleExecutePaymentAndBooking = async (paymentMethod: string) => {
-    setIsSubmitting(true)
-    setBookingError(null)
-
-    try {
-      const response = await createBooking({
-        eventId: String(event.id),
-        showId: showtime.id,
-        seatIds: selectedSeatIds,
-      })
-
-      setIsPaymentModalOpen(false)
-      onBookingSuccess(response, selectedSeats, paymentMethod)
-    } catch (err: unknown) {
-      console.warn('Booking creation failed via API Gateway:', err)
-      const msg = err instanceof Error ? err.message : 'Unknown booking error'
-      setBookingError(
-        `Failed to complete booking with Booking Service (:8082): ${msg}. Check that booking-service is active.`
-      )
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
   return (
@@ -143,7 +138,7 @@ export function SeatSelectionView({
       <div className="hm-container hm-seat-layout">
         <div className="hm-seat-layout__matrix">
           <SeatMatrix
-            seats={initialSeats}
+            seats={seats}
             selectedSeatIds={selectedSeatIds}
             onToggleSeat={handleToggleSeat}
             maxSeats={maxAllowedSeats}
@@ -157,13 +152,13 @@ export function SeatSelectionView({
             selectedSeats={selectedSeats}
             onRemoveSeat={handleRemoveSeat}
             onConfirmBooking={handleProceedToPayment}
-            isSubmitting={isSubmitting}
-            error={bookingError}
+            isSubmitting={false}
+            error={null}
           />
         </div>
       </div>
 
-      {/* Checkout / Payment Modal Step */}
+      {/* Checkout / Stripe Payment Modal Step */}
       <PaymentModal
         isOpen={isPaymentModalOpen}
         event={event}
@@ -171,9 +166,10 @@ export function SeatSelectionView({
         selectedSeats={selectedSeats}
         currentUser={currentUser}
         onClose={() => setIsPaymentModalOpen(false)}
-        onConfirmPayment={handleExecutePaymentAndBooking}
-        isProcessing={isSubmitting}
-        error={bookingError}
+        onBookingSuccess={(booking, seats, paymentMethod) => {
+          setIsPaymentModalOpen(false)
+          onBookingSuccess(booking, seats, paymentMethod)
+        }}
       />
     </div>
   )
