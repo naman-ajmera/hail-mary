@@ -44,7 +44,7 @@ Part of the **MSc Software Engineering** project.
    - Real-time price breakdown (ticket subtotal + convenience fees = grand total).
    - 10-minute hold reservation timer (`10:00` countdown).
 7. **Checkout & Payment Step**:
-   - Payment method selector: Credit / Debit Card, Revolut One-Click, and PayPal Express.
+   - Payment method selector: Stripe.
    - Prepared for future payment microservice integration.
 8. **Real Backend Booking Dispatch**:
    - Submits `{ eventId, showId, seatIds }` directly to `POST /api/bookings` in `booking-service`.

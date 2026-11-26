@@ -1,8 +1,29 @@
 server:
   port: ${SERVER_PORT:8082}
+
 spring:
   application:
     name: booking-service
+  datasource:
+    url: jdbc:h2:mem:bookingdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY:sk_test_placeholder_hail_mary}
+  publishable-key: ${STRIPE_PUBLISHABLE_KEY:pk_test_placeholder_hail_mary}
+  currency: ${STRIPE_CURRENCY:eur}
+
 management:
   endpoints:
     web:

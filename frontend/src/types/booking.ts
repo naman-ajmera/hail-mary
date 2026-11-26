@@ -26,21 +26,41 @@ export interface Showtime {
   priceTiers: Record<SeatTier, number>
 }
 
-// Request payload matching BookingController.CreateRequest
+// Request payload matching BookingController CreateBookingRequest
 export interface CreateBookingRequest {
   eventId: string
   showId: string
   seatIds: string[]
+  totalAmount?: number
+  currency?: string
 }
 
-// Response matching BookingController.Booking
+export interface ConfirmBookingRequest {
+  paymentMethod?: string
+  paymentIntentId?: string
+}
+
+// Response matching BookingController BookingResponse
 export interface BookingResponse {
   bookingId: string
+  userId?: string
   eventId: string
   showId: string
   seatIds: string[]
+  totalAmount?: number
+  currency?: string
   status: string
+  stripePaymentIntentId?: string
+  stripeClientSecret?: string
+  paymentMethod?: string
+  publishableKey?: string
   createdAt: string
+  updatedAt?: string
+}
+
+export interface StripeConfigResponse {
+  publishableKey: string
+  currency: string
 }
 
 export interface BookingOrderDraft {
@@ -59,4 +79,3 @@ export interface BookingOrderDraft {
   convenienceFee: number
   total: number
 }
-
